@@ -19,7 +19,6 @@ Space_Invider est un jeu d'arcade en 2D dans lequel le joueur contrôle un vaiss
 
 - HTML5
 - JavaScript (vanilla)
-- Canvas API
 - Node.js (serveur local)
 
 ## 📁 Structure du projet
