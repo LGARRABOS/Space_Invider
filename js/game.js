@@ -17,6 +17,28 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
+
+if (typeof GameLogic === 'undefined') {
+    throw new Error('GameLogic helpers are required for the game to run.');
+}
+
+const DIFFICULTY_CONFIG = {
+    ...GameLogic.DEFAULT_CONFIG,
+    verticalIncrement: 15,
+    horizontalIncrement: 15,
+    delayDecrement: 200,
+    minDelay: 800,
+};
+
+let difficultyState = GameLogic.resetDifficulty(DIFFICULTY_CONFIG);
+let waveLevel = difficultyState.waveLevel;
+let alienSpeed = difficultyState.verticalSpeed; // Vitesse de descente des aliens
+let alienHorizontalSpeed = difficultyState.horizontalSpeed; // Vitesse horizontale des aliens
+let alienDirection = 1;
+
+const HORIZONTAL_PADDING = DIFFICULTY_CONFIG.boundaryPadding;
+const EXTRA_DROP_FACTOR = 0.5;
+
 let player;
 let cursors;
 let bullets;
@@ -27,7 +49,6 @@ let scoreText;
 let lives = 3;
 let livesText;
 let moveAliensTimer;
-let alienSpeed = 60; // Vitesse de descente des aliens
 let gameOverText; // Texte de Game Over
 let invulnerable = false; // Flag pour l'invulnérabilité temporaire
 let isGameOver = false; // Flag pour indiquer que le jeu est terminé
@@ -52,6 +73,12 @@ function update(time, delta) {
 
     // Vérifier si tous les aliens ont été détruits et créer une nouvelle vague
     if (aliens.countActive(true) === 0) {
+        difficultyState = GameLogic.applyDifficultyProgression(difficultyState, DIFFICULTY_CONFIG);
+        waveLevel = difficultyState.waveLevel;
+        alienSpeed = difficultyState.verticalSpeed;
+        alienHorizontalSpeed = difficultyState.horizontalSpeed;
+        alienDirection = 1;
+        scheduleAlienMovement(this);
         createAliens(this);
     }
 }
@@ -66,6 +93,12 @@ function createGraphics() {
 }
 
 function initializeGame() {
+    difficultyState = GameLogic.resetDifficulty(DIFFICULTY_CONFIG);
+    waveLevel = difficultyState.waveLevel;
+    alienSpeed = difficultyState.verticalSpeed;
+    alienHorizontalSpeed = difficultyState.horizontalSpeed;
+    alienDirection = 1;
+
     player = this.physics.add.sprite(config.width / 2, config.height - 100, 'player').setCollideWorldBounds(true);
     player.setScale(0.1); // Redimensionner le joueur
 
@@ -74,6 +107,7 @@ function initializeGame() {
         maxSize: 10 // Limiter le nombre maximum de projectiles
     });
 
+    aliens = this.physics.add.group();
     createAliens(this);
 
     cursors = this.input.keyboard.createCursorKeys();
@@ -93,13 +127,7 @@ function initializeGame() {
 
     this.physics.world.setBoundsCollision(true, true, true, false);
 
-    // Démarrer le timer pour faire descendre les aliens
-    moveAliensTimer = this.time.addEvent({
-        delay: 2000, // Intervalle de temps en millisecondes
-        callback: moveAliensDown,
-        callbackScope: this,
-        loop: true
-    });
+    scheduleAlienMovement(this);
 }
 
 function handlePlayerMovement() {
@@ -212,11 +240,48 @@ function loseLife() {
 function moveAliensDown() {
     if (isGameOver) return;
 
-    aliens.children.each(function(alien) {
+    const activeAliens = aliens ? aliens.getChildren().filter(alien => alien.active) : [];
+
+    if (activeAliens.length === 0) {
+        return;
+    }
+
+    const shouldReverse = GameLogic.willHitHorizontalBounds(
+        activeAliens.map(alien => alien.x),
+        alienDirection,
+        alienHorizontalSpeed,
+        config.width,
+        HORIZONTAL_PADDING
+    );
+
+    activeAliens.forEach((alien) => {
+        alien.x += alienDirection * alienHorizontalSpeed;
         alien.y += alienSpeed; // Descendre les aliens de la vitesse définie
     });
+
+    if (shouldReverse) {
+        alienDirection *= -1;
+        activeAliens.forEach((alien) => {
+            alien.x = Phaser.Math.Clamp(alien.x, HORIZONTAL_PADDING, config.width - HORIZONTAL_PADDING);
+            alien.y += alienSpeed * EXTRA_DROP_FACTOR;
+        });
+    }
+
     // Ajouter de nouveaux aliens
-    addNewAliens(this);
+    addNewAliens();
+}
+
+function scheduleAlienMovement(scene) {
+    if (moveAliensTimer) {
+        moveAliensTimer.remove();
+    }
+
+    moveAliensTimer = scene.time.addEvent({
+        delay: difficultyState.timerDelay,
+        callback: moveAliensDown,
+        callbackScope: scene,
+        loop: true
+    });
 }
 
 function createAliens(scene) {
@@ -225,7 +290,11 @@ function createAliens(scene) {
     const maxAlienCount = Math.floor(config.width / alienSpacingX); // Nombre maximum d'aliens pouvant tenir sur la largeur
     const alienCount = Phaser.Math.Between(3, maxAlienCount); // Randomiser le nombre d'aliens avec un minimum de 3
 
-    aliens = scene.physics.add.group();
+    if (!aliens) {
+        aliens = scene.physics.add.group();
+    } else {
+        aliens.clear(true, true);
+    }
 
     const positions = [];
     for (let i = 0; i < alienCount; i++) {
@@ -239,7 +308,7 @@ function createAliens(scene) {
     }
 }
 
-function addNewAliens(scene) {
+function addNewAliens() {
     const alienSpacingX = 70; // Espacement horizontal entre les aliens
     const minDistance = 50; // Distance minimale entre les aliens
     const maxAlienCount = Math.floor(config.width / alienSpacingX); // Nombre maximum d'aliens pouvant tenir sur la largeur
@@ -266,6 +335,12 @@ function restartGame() {
     isGameOver = false;
     invulnerable = false;
 
+    difficultyState = GameLogic.resetDifficulty(DIFFICULTY_CONFIG);
+    waveLevel = difficultyState.waveLevel;
+    alienSpeed = difficultyState.verticalSpeed;
+    alienHorizontalSpeed = difficultyState.horizontalSpeed;
+    alienDirection = 1;
+
     // Réinitialiser les textes de score et de vies
     scoreText.setText('Score: ' + score);
     livesText.setText('Lives: ' + lives);
@@ -284,18 +359,13 @@ function restartGame() {
     player.setPosition(config.width / 2, config.height - 100);
 
     // Supprimer les aliens et en créer de nouveaux
-    aliens.clear(true, true);
     createAliens(this);
 
     // Supprimer les projectiles
     bullets.clear(true, true);
 
     // Redémarrer le timer pour faire descendre les aliens
-    moveAliensTimer.paused = false;
-
-    // Réinitialiser les collisions
-    this.physics.add.collider(bullets, aliens, hitAlien, null, this);
-    this.physics.add.overlap(player, aliens, playerHit, null, this);
+    scheduleAlienMovement(this);
 }
 
 window.addEventListener('resize', () => {
