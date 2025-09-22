@@ -51,8 +51,6 @@ space-invaders/
 npm start
 ```
 
-4. Ouvre un navigateur à l'adresse [http://localhost:3000](http://localhost:3000)
-
 
 ## 🤖 Créé avec l'aide de l'IA
 
