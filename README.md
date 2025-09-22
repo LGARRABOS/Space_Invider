@@ -51,17 +51,7 @@ space-invaders/
 npm start
 ```
 
-   Le jeu est ensuite accessible à l'adresse [http://localhost:3000](http://localhost:3000). Tu peux aussi définir la variable d'environnement `PORT` pour utiliser un autre port.
-
-4. Pour arrêter le serveur, utilise `Ctrl + C` dans le terminal.
-
-## 🧪 Tests
-
-Des tests automatisés vérifient la logique de progression de la difficulté ainsi que le serveur HTTP. Ils se lancent avec :
-
-```bash
-npm test
-```
+4. Ouvre un navigateur à l'adresse [http://localhost:3000](http://localhost:3000)
 
 
 ## 🤖 Créé avec l'aide de l'IA
