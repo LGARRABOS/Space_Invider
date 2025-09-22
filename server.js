@@ -2,46 +2,50 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-http.createServer(function (request, response) {
-    console.log('request ', request.url);
+const mimeTypes = {
+    '.html': 'text/html',
+    '.js': 'text/javascript',
+    '.css': 'text/css',
+    '.json': 'application/json',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.gif': 'image/gif',
+    '.svg': 'image/svg+xml'
+};
 
-    var filePath = '.' + request.url;
-    if (filePath == './') {
-        filePath = './index.html';
-    }
+const server = http.createServer((request, response) => {
+    console.log('request', request.url);
 
-    var extname = String(path.extname(filePath)).toLowerCase();
-    var mimeTypes = {
-        '.html': 'text/html',
-        '.js': 'text/javascript',
-        '.css': 'text/css',
-        '.json': 'application/json',
-        '.png': 'image/png',
-        '.jpg': 'image/jpeg',
-        '.gif': 'image/gif',
-        '.svg': 'image/svg+xml'
-    };
+    const [rawPath] = request.url.split('?');
+    const sanitizedPath = rawPath === '/' ? 'index.html' : rawPath.replace(/^\/+/, '').replace(/(\.\.[\\/]+)/g, '') || 'index.html';
+    const filePath = path.join(__dirname, sanitizedPath);
 
-    var contentType = mimeTypes[extname] || 'application/octet-stream';
+    const extname = String(path.extname(filePath)).toLowerCase();
+    const contentType = mimeTypes[extname] || 'application/octet-stream';
 
-    fs.readFile(filePath, function(error, content) {
+    fs.readFile(filePath, (error, content) => {
         if (error) {
-            if(error.code == 'ENOENT'){
-                fs.readFile('./404.html', function(error, content) {
-                    response.writeHead(404, { 'Content-Type': 'text/html' });
-                    response.end(content, 'utf-8');
-                });
+            if (error.code === 'ENOENT') {
+                response.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
+                response.end('<h1>404 - Fichier non trouvé</h1>');
+            } else {
+                response.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
+                response.end('Sorry, check with the site admin for error: ' + error.code + ' ..\n');
             }
-            else {
-                response.writeHead(500);
-                response.end('Sorry, check with the site admin for error: '+error.code+' ..\n');
-            }
+            return;
         }
-        else {
-            response.writeHead(200, { 'Content-Type': contentType });
-            response.end(content, 'utf-8');
-        }
-    });
 
-}).listen(80);
-console.log('Server running at http://127.0.0.1:80/');
+        response.writeHead(200, { 'Content-Type': contentType });
+        response.end(content, 'utf-8');
+    });
+});
+
+const PORT = process.env.PORT || 3000;
+
+if (require.main === module) {
+    server.listen(PORT, () => {
+        console.log(`Server running at http://127.0.0.1:${PORT}/`);
+    });
+}
+
+module.exports = server;

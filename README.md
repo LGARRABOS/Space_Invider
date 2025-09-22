@@ -1,10 +1,10 @@
-# Space_Invider
+# Space Invaders
 
 Un mini-jeu inspiré de Space Invaders, réalisé à 100% avec l'aide de l'intelligence artificielle.
 
 ## 🎮 Description
 
-Space_Invider est un jeu d'arcade en 2D dans lequel le joueur contrôle un vaisseau spatial et doit éliminer des vagues d’aliens ennemis. Il a été entièrement généré avec l'aide d'une IA, depuis le code jusqu'aux visuels et à la logique du jeu.
+Space Invaders est un jeu d'arcade en 2D dans lequel le joueur contrôle un vaisseau spatial et doit éliminer des vagues d’aliens ennemis. Il a été entièrement généré avec l'aide d'une IA, depuis le code jusqu'aux visuels et à la logique du jeu.
 
 ## 🚀 Fonctionnalités
 
@@ -24,7 +24,7 @@ Space_Invider est un jeu d'arcade en 2D dans lequel le joueur contrôle un vaiss
 ## 📁 Structure du projet
 
 ```
-Space_Invider-main/
+space-invaders/
 ├── assets/
 │   └── images/
 │       ├── alien_sprite.png
@@ -46,7 +46,7 @@ Space_Invider-main/
 node server.js
 ```
 
-4. Ouvre un navigateur à l'adresse [http://localhost:3000](http://localhost:3000)
+4. Ouvre un navigateur à l'adresse [http://localhost:3000](http://localhost:3000). Tu peux aussi définir la variable d'environnement `PORT` pour utiliser un autre port.
 
 
 ## 🤖 Créé avec l'aide de l'IA
