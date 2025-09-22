@@ -1,10 +1,10 @@
-# Space_Invider
+# Space Invaders
 
 Un mini-jeu inspiré de Space Invaders, réalisé à 100% avec l'aide de l'intelligence artificielle.
 
 ## 🎮 Description
 
-Space_Invider est un jeu d'arcade en 2D dans lequel le joueur contrôle un vaisseau spatial et doit éliminer des vagues d’aliens ennemis. Il a été entièrement généré avec l'aide d'une IA, depuis le code jusqu'aux visuels et à la logique du jeu.
+Space Invaders est un jeu d'arcade en 2D dans lequel le joueur contrôle un vaisseau spatial et doit éliminer des vagues d’aliens ennemis. Il a été entièrement généré avec l'aide d'une IA, depuis le code jusqu'aux visuels et à la logique du jeu.
 
 ## 🚀 Fonctionnalités
 
@@ -24,14 +24,19 @@ Space_Invider est un jeu d'arcade en 2D dans lequel le joueur contrôle un vaiss
 ## 📁 Structure du projet
 
 ```
-Space_Invider-main/
+space-invaders/
 ├── assets/
 │   └── images/
 │       ├── alien_sprite.png
 │       └── player_sprite.png
 ├── js/
-│   └── game.js
+│   ├── game.js
+│   └── gameLogic.js
+├── test/
+│   ├── gameLogic.test.js
+│   └── server.test.js
 ├── index.html
+├── package.json
 ├── server.js
 └── README.md
 ```
@@ -40,13 +45,31 @@ Space_Invider-main/
 
 1. Installe Node.js si ce n'est pas déjà fait.
 2. Ouvre un terminal dans le dossier du projet.
-3. Lance le serveur local avec la commande :
+3. Installe les dépendances (optionnel) et lance le serveur local :
+
+   - soit via npm :
+
+     ```bash
+     npm start
+     ```
+
+   - soit avec le script d'exécution automatique `start.sh` (il installe les dépendances manquantes puis lance le serveur) :
+
+     ```bash
+     ./start.sh
+     ```
+
+   Le jeu est ensuite accessible à l'adresse [http://localhost:3000](http://localhost:3000). Tu peux aussi définir la variable d'environnement `PORT` pour utiliser un autre port.
+
+4. Pour arrêter le serveur, utilise `Ctrl + C` dans le terminal.
+
+## 🧪 Tests
+
+Des tests automatisés vérifient la logique de progression de la difficulté ainsi que le serveur HTTP. Ils se lancent avec :
 
 ```bash
-node server.js
+npm test
 ```
-
-4. Ouvre un navigateur à l'adresse [http://localhost:3000](http://localhost:3000)
 
 
 ## 🤖 Créé avec l'aide de l'IA
