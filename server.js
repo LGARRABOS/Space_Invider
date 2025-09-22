@@ -15,7 +15,8 @@ const mimeTypes = {
 
 const PUBLIC_DIR = __dirname;
 const DEFAULT_FILE = 'index.html';
-const NOT_FOUND_HTML = `<!DOCTYPE html>
+const NOT_FOUND_FILE = path.join(PUBLIC_DIR, '404.html');
+const FALLBACK_NOT_FOUND_HTML = `<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="utf-8">
@@ -43,8 +44,21 @@ function resolveFilePath(rawUrl) {
     return path.join(PUBLIC_DIR, normalizedPath);
 }
 
+function serveNotFound(response) {
+    fs.readFile(NOT_FOUND_FILE, (readError, content) => {
+        response.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
+
+        if (!readError) {
+            response.end(content);
+            return;
+        }
+
+        response.end(FALLBACK_NOT_FOUND_HTML);
+    });
+}
+
 const server = http.createServer((request, response) => {
-    console.log('request', request.url);
+    console.log('request ', request.url);
 
     const filePath = resolveFilePath(request.url);
     if (!filePath) {
@@ -59,8 +73,7 @@ const server = http.createServer((request, response) => {
     fs.readFile(filePath, (error, content) => {
         if (error) {
             if (error.code === 'ENOENT') {
-                response.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
-                response.end(NOT_FOUND_HTML);
+                serveNotFound(response);
             } else if (error.code === 'EISDIR') {
                 response.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
                 response.end('Accès refusé');
