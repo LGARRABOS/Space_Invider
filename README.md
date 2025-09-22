@@ -30,8 +30,13 @@ space-invaders/
 │       ├── alien_sprite.png
 │       └── player_sprite.png
 ├── js/
-│   └── game.js
+│   ├── game.js
+│   └── gameLogic.js
+├── test/
+│   ├── gameLogic.test.js
+│   └── server.test.js
 ├── index.html
+├── package.json
 ├── server.js
 └── README.md
 ```
@@ -40,13 +45,13 @@ space-invaders/
 
 1. Installe Node.js si ce n'est pas déjà fait.
 2. Ouvre un terminal dans le dossier du projet.
-3. Lance le serveur local avec la commande :
+3. Installe les dépendances (optionnel) et lance le serveur local :
 
 ```bash
-node server.js
+npm start
 ```
 
-4. Ouvre un navigateur à l'adresse [http://localhost:3000](http://localhost:3000). Tu peux aussi définir la variable d'environnement `PORT` pour utiliser un autre port.
+4. Ouvre un navigateur à l'adresse [http://localhost:3000](http://localhost:3000)
 
 
 ## 🤖 Créé avec l'aide de l'IA
