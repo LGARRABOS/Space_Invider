@@ -1,0 +1,17 @@
+{
+  "name": "space-invaders",
+  "version": "1.0.0",
+  "description": "Space Invaders browser game served with Node.js",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "keywords": [
+    "game",
+    "space-invaders",
+    "node"
+  ],
+  "author": "",
+  "license": "MIT"
+}
