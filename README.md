@@ -47,28 +47,8 @@ space-invaders/
 2. Ouvre un terminal dans le dossier du projet.
 3. Installe les dépendances (optionnel) et lance le serveur local :
 
-   - soit via npm :
-
-     ```bash
-     npm start
-     ```
-
-   - soit avec le script d'exécution automatique `start.sh` (il installe les dépendances manquantes puis lance le serveur) :
-
-     ```bash
-     ./start.sh
-     ```
-
-   Le jeu est ensuite accessible à l'adresse [http://localhost:3000](http://localhost:3000). Tu peux aussi définir la variable d'environnement `PORT` pour utiliser un autre port.
-
-4. Pour arrêter le serveur, utilise `Ctrl + C` dans le terminal.
-
-## 🧪 Tests
-
-Des tests automatisés vérifient la logique de progression de la difficulté ainsi que le serveur HTTP. Ils se lancent avec :
-
 ```bash
-npm test
+npm start
 ```
 
 
